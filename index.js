@@ -11,7 +11,7 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://dummy-succ-client.onrender.com",
   })
 );
 
@@ -43,13 +43,13 @@ app.use("/message", messageRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 // Configure socket.io with CORS
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000", // Your React app URL
+    origin: "https://dummy-succ-client.onrender.com", // Your React app URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Authorization"],
     credentials: true
