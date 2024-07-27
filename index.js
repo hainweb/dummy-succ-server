@@ -1,0 +1,71 @@
+const express = require("express");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const http = require('http');
+const socketIo = require('socket.io');
+
+const app = express();
+dotenv.config();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
+
+app.use(express.json());
+
+const userRoutes = require("./Routes/userRoutes");
+const chatRoutes = require("./Routes/chatRoutes");
+const messageRoutes = require("./Routes/messageRoutes");
+
+const connectDb = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Server is Connected to Database");
+  } catch (err) {
+    console.log("Server is NOT connected to Database", err.message);
+  }
+};
+connectDb();
+
+app.get("/", (req, res) => {
+  res.send("API is running123");
+});
+
+app.use("/user", userRoutes);
+app.use("/chat", chatRoutes);
+app.use("/message", messageRoutes);
+
+// Error Handling middlewares
+app.use(notFound);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
+
+// Configure socket.io with CORS
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000", // Your React app URL
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Authorization"],
+    credentials: true
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('sendMessage', (message) => {
+    io.emit('receiveMessage', message);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
