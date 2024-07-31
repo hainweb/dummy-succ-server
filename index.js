@@ -5,6 +5,7 @@ const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const http = require('http');
 const socketIo = require('socket.io');
+const User = require('./modals/userModel'); // Import the User model
 
 const app = express();
 dotenv.config();
@@ -61,6 +62,15 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', (message) => {
     io.emit('receiveMessage', message);
+  });
+
+  socket.on('updateStatus', async ({ userId, status }) => {
+    try {
+      await User.findByIdAndUpdate(userId, { status }, { new: true });
+      io.emit('userStatus', { userId, status });
+    } catch (error) {
+      console.error('Error updating user status:', error);
+    }
   });
 
   socket.on('disconnect', () => {
