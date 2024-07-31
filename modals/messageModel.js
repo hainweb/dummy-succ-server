@@ -20,7 +20,7 @@ const messageModel = mongoose.Schema(
     },
   },
   {
-    timeStamp: true,
+    timestamps: true, // Ensure this is set to true
   }
 );
 
