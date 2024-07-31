@@ -5,19 +5,24 @@ const userModel = mongoose.Schema(
   {
     name: {
       type: String,
-      requried: true,
+      required: true,
     },
     email: {
       type: String,
-      requried: true,
+      required: true,
     },
     password: {
       type: String,
-      requried: true,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['online', 'offline'],
+      default: 'offline',
     },
   },
   {
-    timeStamp: true,
+    timestamps: true, // corrected to 'timestamps'
   }
 );
 
@@ -26,7 +31,7 @@ userModel.methods.matchPassword = async function (enteredPassword) {
 };
 
 userModel.pre("save", async function (next) {
-  if (!this.isModified) {
+  if (!this.isModified("password")) {
     next();
   }
 
