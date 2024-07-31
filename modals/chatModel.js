@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const chatModel = mongoose.Schema(
   {
     chatName: { type: String },
@@ -20,7 +21,7 @@ const chatModel = mongoose.Schema(
     },
   },
   {
-    timeStamp: true,
+    timestamps: true, // Correct spelling
   }
 );
 
